@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "795356093918",
+    "firebase_url": "https://bimesajsohbet.firebaseio.com",
+    "project_id": "bimesajsohbet",
+    "storage_bucket": "bimesajsohbet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795356093918:android:8dd31bbc1972c160",
+        "android_client_info": {
+          "package_name": "com.elias.bimesajsohbet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "795356093918-9dsckf91desd9380tvkd4d542rnkto8b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elias.bimesajsohbet",
+            "certificate_hash": "2e8405702f568564c8c7be3d405e4bea0607d8d3"
+          }
+        },
+        {
+          "client_id": "795356093918-272ajh6jtomqqnvrtfbgc0soin438qe6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBntt-_2xPy7w5uL4NP0Nirvd4dysp5v2g"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "795356093918-272ajh6jtomqqnvrtfbgc0soin438qe6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
