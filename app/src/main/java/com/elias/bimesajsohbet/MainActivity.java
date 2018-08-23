@@ -74,12 +74,15 @@ public class MainActivity extends AppCompatActivity {
 
         if(item.getItemId() == R.id.main_logout_button){
             mAuth.signOut();
-
             LogOutUser();
         }
         if (item.getItemId() == R.id.main_account_settings_button){
             Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(settingsIntent);
+        }
+        if (item.getItemId() == R.id.main_users_button){
+            Intent allUsersIntent = new Intent(MainActivity.this, UsersActivity.class);
+            startActivity(allUsersIntent);
         }
         return true;
     }

@@ -1,5 +1,6 @@
 package com.elias.bimesajsohbet;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,8 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
@@ -52,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
     Bitmap thumb_bitmap = null;
+    private ProgressDialog loadingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +67,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         storeProfileImageStorageRef = FirebaseStorage.getInstance().getReference().child("Profile_Image");
         thumbImageRef = FirebaseStorage.getInstance().getReference().child("Thumb_Images");
-
+        loadingBar = new ProgressDialog(this);
         String online_user_id = mAuth.getCurrentUser().getUid();
 
         getUserDataReference = FirebaseDatabase.getInstance().getReference().child("Users").child(online_user_id);
@@ -127,6 +132,13 @@ public class SettingsActivity extends AppCompatActivity {
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
+
+                loadingBar.setTitle("Profil resmi güncelleniyor.");
+                loadingBar.setMessage("Lütfen bekleyiniz...");
+                loadingBar.show();
+
+
+
                 Uri resultUri = result.getUri();
 
                 File thumb_filePathUri = new File(resultUri.getPath());
@@ -160,25 +172,41 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(SettingsActivity.this, "Kaydedildi.", Toast.LENGTH_SHORT).show();
-
-
+                            Toast.makeText(SettingsActivity.this, "Başarıyla kaydedildi.", Toast.LENGTH_SHORT).show();
 
                             final String downloadUrl = task.getResult().getDownloadUrl().toString();
 
                             UploadTask uploadTask = thumb_filePath.putBytes(thumb_byte);
 
+                            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+                                    String thumb_downloadUri = thumb_task.getResult().getDownloadUrl().toString();
+
+                                    if(thumb_task.isSuccessful()){
+                                        Map update_user_data = new HashMap();
+                                        update_user_data.put("user_image",downloadUrl);
+                                        update_user_data.put("user_thumb_image",thumb_downloadUri);
 
 
-                            getUserDataReference.child("user_image").setValue(downloadUrl)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
+                                        getUserDataReference.updateChildren(update_user_data)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        Toast.makeText(SettingsActivity.this, "Profil resmi başarıyla yüklendi.", Toast.LENGTH_LONG).show();
+                                                        loadingBar.dismiss();
+                                                    }
+                                                });
+                                    }
+                                }
+                            });
 
-                                        }
-                                    });
+
+
+
                         } else {
-                            Toast.makeText(SettingsActivity.this, "Resim yüklenirken hata oldu. Lütfen daha sonra tekrar deneyiniz.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this, "Resim yüklenirken hata oldu. Lütfen daha sonra tekrar deneyiniz.", Toast.LENGTH_LONG).show();
+                            loadingBar.dismiss();
                         }
                     }
                 });

@@ -10,6 +10,12 @@
 
     </item>
 
+    <item android:title="Kullanıcılar"
+        android:id="@+id/main_users_button"
+        app:showAsAction="never">
+
+    </item>
+
     <item android:title="Çıkış"
         android:id="@+id/main_logout_button"
         app:showAsAction="never">
