@@ -1,0 +1,45 @@
+package com.elias.bimesajsohbet;
+
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.provider.ContactsContract;
+import android.support.v4.app.NotificationCompat;
+
+import com.google.firebase.messaging.RemoteMessage;
+
+public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
+
+
+
+        String notification_title = remoteMessage.getData().get("title");
+        String notification_body = remoteMessage.getData().get("body");
+
+
+        String click_action = remoteMessage.getData().get("click_action");
+
+        String from_sender_id = remoteMessage.getData().get("from_sender_id").toString();
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle(notification_title)
+                        .setContentText(notification_body);
+
+        Intent resultIntent = new Intent(click_action);
+        resultIntent.putExtra("visit_user_id",from_sender_id);
+
+
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this,0,resultIntent,PendingIntent.FLAG_ONE_SHOT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        int mNotificationId = (int)System.currentTimeMillis();
+        NotificationManager mNotifyMgr =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+    }
+}

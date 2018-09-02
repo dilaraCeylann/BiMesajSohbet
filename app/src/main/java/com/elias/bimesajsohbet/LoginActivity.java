@@ -13,9 +13,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,21 +29,27 @@ public class LoginActivity extends AppCompatActivity {
     private EditText LoginEmail;
     private EditText LoginPassword;
     private ProgressDialog loadingBar;
+
+    private DatabaseReference usersReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        usersReference = FirebaseDatabase.getInstance().getReference().child("Users");
 
         mToolbar = findViewById(R.id.login_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Giriş Yap");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        LoginButton = (Button) findViewById(R.id.login_button);
-        LoginEmail = (EditText) findViewById(R.id.login_email);
-        LoginPassword = (EditText) findViewById(R.id.login_password);
+        LoginButton = findViewById(R.id.login_button);
+        LoginEmail = findViewById(R.id.login_email);
+        LoginPassword = findViewById(R.id.login_password);
+
+
 
         loadingBar = new ProgressDialog(this);
 
@@ -57,12 +67,9 @@ public class LoginActivity extends AppCompatActivity {
     private void LoginUserAccount(String email, String password){
         if (TextUtils.isEmpty(email)){
             Toast.makeText(LoginActivity.this, "Lütfen emailinizi giriniz.", Toast.LENGTH_SHORT).show();
-        }
-        if (TextUtils.isEmpty(password)){
+        } else if (TextUtils.isEmpty(password)){
             Toast.makeText(LoginActivity.this, "Lütfen şifrenizi giriniz.", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
+        } else {
             loadingBar.setTitle("Giriş yapılıyor.");
             loadingBar.setMessage("Lütfen giriş yaparken bekleyiniz.");
             loadingBar.show();
@@ -72,10 +79,20 @@ public class LoginActivity extends AppCompatActivity {
                        public void onComplete(@NonNull Task<AuthResult> task)
                        {
                            if (task.isSuccessful()){
-                               Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(mainIntent);
-                                finish();
+                               String online_user_id = mAuth.getCurrentUser().getUid();
+                               String Device_Token = FirebaseInstanceId.getInstance().getToken();
+
+                               usersReference.child(online_user_id).child("device_token").setValue(Device_Token)
+                                       .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                           @Override
+                                           public void onSuccess(Void aVoid) {
+                                               Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                                               mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                               startActivity(mainIntent);
+                                               finish();
+                                           }
+                                       });
+
                            }
                            else
                            {

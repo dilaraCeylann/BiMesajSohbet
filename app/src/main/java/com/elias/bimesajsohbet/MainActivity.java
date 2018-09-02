@@ -1,5 +1,7 @@
 package com.elias.bimesajsohbet;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -8,18 +10,27 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
 
     private ViewPager myViewPager;
     private TabLayout myTabLayout;
     private TabsPagerAdapter myTabsPagerAdapter;
-    //lalala
+
+    FirebaseUser currentUser;
+    private DatabaseReference UsersReference;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +38,15 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        currentUser = mAuth.getCurrentUser();
+
+
+        if(currentUser != null){
+
+            String online_user_id = mAuth.getCurrentUser().getUid();
+            UsersReference = FirebaseDatabase.getInstance().getReference()
+                    .child("Users").child(online_user_id);
+        }
         myViewPager = findViewById(R.id.main_tabs_pager);
         myTabsPagerAdapter = new TabsPagerAdapter(getSupportFragmentManager());
         myViewPager.setAdapter(myTabsPagerAdapter);
@@ -45,10 +65,37 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
 
         if(currentUser == null){
             LogOutUser();
+        } else if(currentUser != null){
+            UsersReference.child("online").setValue("true");
+        }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(isFinishing()) {
+            ExitingApp();
+        }
+    }
+    public void ExitingApp(){
+        if (currentUser != null) {
+                UsersReference.child("online").setValue(ServerValue.TIMESTAMP);
+            Toast.makeText(this, "Kapandı", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+    public void ResumingToApp(){
+        currentUser = mAuth.getCurrentUser();
+
+        if(currentUser == null){
+            LogOutUser();
+        } else if(currentUser != null){
+            UsersReference.child("online").setValue("true");
         }
     }
 
@@ -73,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
         super.onOptionsItemSelected(item);
 
         if(item.getItemId() == R.id.main_logout_button){
+            if(currentUser != null){
+                UsersReference.child("online").setValue(ServerValue.TIMESTAMP);
+            }
             mAuth.signOut();
             LogOutUser();
         }
@@ -87,3 +137,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 }
+
+
+

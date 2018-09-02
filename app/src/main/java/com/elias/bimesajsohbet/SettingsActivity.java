@@ -25,6 +25,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -71,6 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
         String online_user_id = mAuth.getCurrentUser().getUid();
 
         getUserDataReference = FirebaseDatabase.getInstance().getReference().child("Users").child(online_user_id);
+        getUserDataReference.keepSynced(true);
 
 
         settingsDisplayProfileImage = findViewById(R.id.settings_profile_image);
@@ -85,14 +88,27 @@ public class SettingsActivity extends AppCompatActivity {
                 String name = dataSnapshot.child("user_name").getValue().toString();
                 String status = dataSnapshot.child("user_status").getValue().toString();
                 String image = dataSnapshot.child("user_image").getValue().toString();
-                String thumb_image = dataSnapshot.child("user_thumb_image").getValue().toString();
+                final String thumb_image = dataSnapshot.child("user_thumb_image").getValue().toString();
 
                 settingsDisplayName.setText(name);
                 settingsDisplayStatus.setText(status);
 
 
-                    if(!image.equals("default_profile")){
-                        Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.standart_insan).into(settingsDisplayProfileImage);
+                    if(!image.equals("standart_insan")){
+                       // Picasso.with(SettingsActivity.this).load(thumb_image).placeholder(R.drawable.standart_insan).into(settingsDisplayProfileImage);
+
+                        Picasso.with(SettingsActivity.this).load(thumb_image).networkPolicy(NetworkPolicy.OFFLINE)
+                                .placeholder(R.drawable.standart_insan).into(settingsDisplayProfileImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+
+                            @Override
+                            public void onError() {
+                                Picasso.with(SettingsActivity.this).load(thumb_image).placeholder(R.drawable.standart_insan).into(settingsDisplayProfileImage);
+                            }
+                        });
                     }
                 }
 

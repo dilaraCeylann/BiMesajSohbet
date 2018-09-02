@@ -18,6 +18,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -82,11 +83,14 @@ public class RegisterActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
+                                String Device_Token = FirebaseInstanceId.getInstance().getToken();
+
                                 String current_user_Id = mAuth.getCurrentUser().getUid();
                                 storeUserDefaultDataReference = FirebaseDatabase.getInstance().getReference().child("Users").child(current_user_Id);
                                 storeUserDefaultDataReference.child("user_name").setValue(name);
                                 storeUserDefaultDataReference.child("user_status").setValue("Merhaba, ben BiMesaj kullanıyorum.");
                                 storeUserDefaultDataReference.child("user_image").setValue("default_profile");
+                                storeUserDefaultDataReference.child("device_token").setValue(Device_Token);
                                 storeUserDefaultDataReference.child("user_thumb_image").setValue("standart_insan")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

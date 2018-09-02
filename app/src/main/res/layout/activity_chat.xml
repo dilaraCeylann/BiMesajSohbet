@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#dedede"
+    tools:context=".ChatActivity">
+
+    <include
+        android:id="@+id/chat_bar_layout"
+        layout="@layout/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></include>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mesaj_kullanıcı_liste"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/chat_bar_layout"
+        android:layout_marginBottom="55dp"
+        app:reverseLayout="false"
+        app:stackFromEnd="true">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="@android:color/background_light"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/sec_buton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="#00000000"
+            android:src="@drawable/ic_clip_image" />
+
+        <EditText
+            android:id="@+id/mesaj_giris"
+            android:layout_width="264dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="Mesaj yaz..."
+            android:inputType="textMultiLine" />
+
+        <ImageButton
+            android:id="@+id/mesaj_gonder"
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:padding="6dp"
+            android:paddingTop="4dp"
+            app:srcCompat="@drawable/ic_send_message" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>
