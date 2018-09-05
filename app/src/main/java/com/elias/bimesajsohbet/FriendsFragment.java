@@ -178,7 +178,7 @@ public class FriendsFragment extends Fragment {
         }
         public void setDate(String date) {
             TextView sinceFriendsDate = mView.findViewById(R.id.users_status);
-            sinceFriendsDate.setText(date);
+            sinceFriendsDate.setText(date + "'dan beri arkadaşsınız.");
         }
         public void setUserName(String userName){
             TextView userNameDisplay = mView.findViewById(R.id.all_users_username);
